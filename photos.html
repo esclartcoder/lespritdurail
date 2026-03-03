@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>L'esprit du rail – Photos</title>
+<link rel="stylesheet" href="galerie.css">
+</head>
+<body>
+<h1>Galerie photo</h1>
+<script>
+fetch("photos.json")
+.then(r=>r.json())
+.then(data=>{
+    const cont=document.createElement("div")
+    cont.className="galerie"
+    Object.entries(data).forEach(([titre,[pays,region,fichier,date,licence]])=>{
+        const img=document.createElement("img")
+        img.src=`photos/${pays}/${region}/${fichier}`
+        img.alt=titre
+        img.onclick=()=>ouvrirModal(titre,{"france":"France"}[pays],{"hdf":"Hauts-de-France","idf":"Île-de-France"}[region],date,licence ?? "© L'esprit du rail",img.src)
+        cont.appendChild(img)
+    })
+    document.body.appendChild(cont)
+})
+.catch(e=>console.error(e))
+
+function ouvrirModal(titre,pays,region,date,licence,src){
+    const overlay=document.createElement("div")
+    overlay.className="overlay"
+    overlay.onclick=e=>{if(e.target===overlay)overlay.remove()}
+    const modal=document.createElement("div")
+    modal.className="modal"
+    const img=document.createElement("img")
+    img.src=src
+    const infos=document.createElement("div")
+    infos.className="infos"
+    infos.innerHTML=`
+        <h2>${titre}</h2>
+        <p><strong>Pays :</strong> ${pays}</p>
+        <p><strong>Région :</strong> ${region}</p>
+        <p><strong>Date :</strong> ${date}</p>
+        <p><strong>Licence :</strong> ${licence}</p>`
+    modal.appendChild(img)
+    modal.appendChild(infos)
+    overlay.appendChild(modal)
+    document.body.appendChild(overlay)
+    document.onkeydown=e=>{if(e.key==="Escape")overlay.remove()}
+}
+</script>
+</body>
+</html>
